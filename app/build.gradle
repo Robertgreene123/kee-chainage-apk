@@ -1,0 +1,52 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace 'ug.kee.chainage'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'ug.kee.chainage'
+        minSdk 24
+        targetSdk 34
+        versionCode 6
+        versionName '6.0'
+    }
+
+    // Keep pre-optimized JPEGs uncompressed in APK so budget phones mmap tiles with zero CPU lag
+    androidResources {
+        noCompress 'jpg'
+    }
+
+    signingConfigs {
+        release {
+            def ksFile = System.getenv('KEYSTORE_FILE')
+            if (ksFile != null && file(ksFile).exists()) {
+                storeFile file(ksFile)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            shrinkResources false
+            def ksFile = System.getenv('KEYSTORE_FILE')
+            if (ksFile != null && file(ksFile).exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // Only tiny WebViewAssetLoader (~60 KB) — zero AppCompat/Material/PlayServices bloat
+    implementation 'androidx.webkit:webkit:1.11.0'
+}

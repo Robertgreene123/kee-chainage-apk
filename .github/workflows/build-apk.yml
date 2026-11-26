@@ -1,0 +1,58 @@
+name: Build Signed KEE Chainage Earth APK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle 8.7
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Generate Release Signing Keystore
+        run: |
+          keytool -genkeypair -v \
+            -keystore release-key.jks \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -alias keechainage \
+            -storepass kee2026pass \
+            -keypass kee2026pass \
+            -dname "CN=KEE Maintenance, OU=Engineering, O=KEE, L=Kampala, C=UG"
+
+      - name: Build Signed Release APK
+        env:
+          KEYSTORE_FILE: ${{ github.workspace }}/release-key.jks
+          KEYSTORE_PASSWORD: kee2026pass
+          KEY_ALIAS: keechainage
+          KEY_PASSWORD: kee2026pass
+        run: |
+          gradle assembleRelease --no-daemon
+
+      - name: Verify APK signature and copy artifact
+        run: |
+          APK="app/build/outputs/apk/release/app-release.apk"
+          ls -lh "$APK"
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME/build-tools"/* | sort -V | tail -n 1)
+          "$BUILD_TOOLS/apksigner" verify --verbose "$APK"
+          cp "$APK" KEE_Chainage_Earth.apk
+
+      - name: Upload KEE_Chainage_Earth.apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: KEE_Chainage_Earth_APK
+          path: KEE_Chainage_Earth.apk
+          retention-days: 30

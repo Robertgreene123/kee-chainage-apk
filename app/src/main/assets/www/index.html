@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KEE Chainage</title>
+  <link rel="stylesheet" href="./vendor/leaflet.css">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div id="map" aria-label="Kampala-Entebbe Expressway Satellite Map"></div>
+
+  <!-- Slim, High-Contrast Top Readout -->
+  <header class="hud-top">
+    <div id="simBanner" class="sim-banner hidden" role="status">
+      <span>SIMULATION MODE — NOT LIVE GPS</span>
+      <button type="button" id="exitSimBtn">Exit</button>
+    </div>
+
+    <section id="hudCard" class="hud-card" aria-live="polite">
+      <div class="hud-row-top">
+        <div class="hud-route-wrap">
+          <span id="codeTag" class="code-tag hidden">AK</span>
+          <span id="alignmentLabel" class="hud-align-name">Kampala–Entebbe Expressway</span>
+        </div>
+        <div class="hud-top-right">
+          <span id="gpsPill" class="gps-pill">
+            <span class="gps-dot"></span>
+            <span id="gpsStatusText">Finding GPS…</span>
+          </span>
+          <button type="button" id="setupBtn" class="gear-btn" aria-label="Interchanges and Setup" title="Menu">⚙</button>
+        </div>
+      </div>
+
+      <div class="hud-main-row">
+        <div id="chainageReadout" class="hud-chainage" title="Tap to copy chainage">
+          <span class="ch-k">K</span>--<span class="ch-plus">+</span>---
+        </div>
+        <span id="sidePill" class="side-pill hidden"></span>
+      </div>
+
+      <div id="copyToast" class="copy-toast hidden">Copied to clipboard!</div>
+      <div id="rampDesc" class="ramp-desc hidden"></div>
+
+      <!-- Appears only when standing at a bridge/overpass where 2 roads cross -->
+      <div id="altRow" class="alt-row hidden" aria-label="Nearby crossing roads"></div>
+
+      <div id="weakGpsStrip" class="alert-strip weak hidden" role="alert"></div>
+      <div id="offAlignStrip" class="alert-strip off hidden" role="alert"></div>
+
+      <button type="button" id="retryGpsBtn" class="retry-gps-btn hidden">Allow / Turn On GPS</button>
+    </section>
+  </header>
+
+  <!-- Single Floating Re-Center Button -->
+  <button type="button" id="followBtn" class="center-fab active" aria-label="Center map on my location" title="Center on me">◎</button>
+
+  <!-- Collapsible Quick-Jump & Desk Test Sheet -->
+  <footer class="hud-bottom">
+    <section id="setupSheet" class="sheet hidden" aria-label="Menu">
+      <div class="sheet-header">
+        <span class="sheet-title">Interchanges (100% Offline)</span>
+        <button type="button" id="closeSetupBtn" class="close-btn">Done</button>
+      </div>
+
+      <div class="sheet-block">
+        <div class="sheet-label">Jump to Interchange</div>
+        <div class="btn-row jump-row">
+          <button type="button" class="pill-btn" data-jump="busega">Busega</button>
+          <button type="button" class="pill-btn" data-jump="kajjansi">Kajjansi</button>
+          <button type="button" class="pill-btn" data-jump="lweza">Lweza</button>
+          <button type="button" class="pill-btn" data-jump="mpala">Mpala</button>
+        </div>
+      </div>
+
+      <div class="sheet-block btn-row">
+        <button type="button" id="fitBtn" class="pill-btn">Full Road</button>
+        <button type="button" id="toggleSimBtn" class="pill-btn">Desk Test</button>
+      </div>
+    </section>
+
+    <!-- Desk Test Simulator (tucked inside ⚙) -->
+    <section id="simDrawer" class="sheet hidden" aria-label="Desk test simulator">
+      <div class="sheet-header">
+        <span class="sheet-title">Desk Test Simulator</span>
+        <span id="simLabel" class="sheet-sub">K11+720</span>
+      </div>
+      <div class="sim-row">
+        <span>Road</span>
+        <select id="simRouteSelect" aria-label="Simulated alignment"></select>
+      </div>
+      <div class="sim-row">
+        <span>Chainage</span>
+        <input id="simChSlider" type="range" min="0" max="25000" step="10" value="11720">
+      </div>
+      <div class="sim-row">
+        <span>Offset (m)</span>
+        <input id="simOffSlider" type="range" min="-80" max="80" step="1" value="0">
+      </div>
+      <div class="btn-row">
+        <button type="button" id="simDriveBtn" class="pill-btn primary">Drive</button>
+        <button type="button" id="simOffRoadBtn" class="pill-btn">Off-Road</button>
+        <button type="button" id="simCloseBtn" class="pill-btn">Exit Sim</button>
+      </div>
+    </section>
+  </footer>
+
+  <script src="./vendor/leaflet.js"></script>
+  <script src="./alignment-data.js"></script>
+  <script src="./geo-engine.js"></script>
+  <script src="./earth-app.js"></script>
+</body>
+</html>
