@@ -8,8 +8,8 @@ android {
         applicationId 'ug.kee.chainage'
         minSdk 24
         targetSdk 34
-        versionCode 6
-        versionName '6.0'
+        versionCode 7
+        versionName '7.0'
     }
 
     // Keep pre-optimized JPEGs uncompressed in APK so budget phones mmap tiles with zero CPU lag
@@ -47,6 +47,8 @@ android {
 }
 
 dependencies {
-    // Only tiny WebViewAssetLoader (~60 KB) — zero AppCompat/Material/PlayServices bloat
+    // Lean AndroidX-only dependencies — zero AppCompat, Material, Kotlin, or Google Play Services bloat
     implementation 'androidx.webkit:webkit:1.11.0'
+    implementation 'androidx.core:core:1.13.1'
+    implementation 'androidx.exifinterface:exifinterface:1.3.7'
 }

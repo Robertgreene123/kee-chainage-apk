@@ -1,5 +1,7 @@
 /**
- * Old-Android-WebView-safe offline chainage projection engine (ES5/ES6 safe: no ??, no ?., no object spread).
+ * Old-Android-WebView-safe offline chainage projection engine v7.
+ * Plain direction labels ("To Entebbe" / "To Busega"), clean no-prefix formatting
+ * for map ticks ("11+750", "0+200"), and single-code photo stamp formatter ("Km1+000", "Mpala AK0+300").
  */
 (function (root, factory) {
   var api = factory();
@@ -26,13 +28,18 @@
     return s;
   }
 
-  function formatChainage(meters, prefix) {
-    var pfx = prefix || "K";
-    if (!isFinite(meters)) return pfx + "--+---";
+  function formatNoPrefix(meters) {
+    if (!isFinite(meters)) return "--+---";
     var clamped = Math.max(0, Math.round(meters));
     var km = Math.floor(clamped / 1000);
     var rem = clamped % 1000;
-    return pfx + km + "+" + pad3(rem);
+    return km + "+" + pad3(rem);
+  }
+
+  function formatChainage(meters, prefix) {
+    var pfx = prefix || "K";
+    if (!isFinite(meters)) return pfx + "--+---";
+    return pfx + formatNoPrefix(meters);
   }
 
   function formatDistance(meters) {
@@ -41,6 +48,41 @@
     if (abs >= 1000) return (abs / 1000).toFixed(2) + " km";
     if (abs >= 100) return Math.round(abs) + " m";
     return abs.toFixed(1) + " m";
+  }
+
+  /**
+   * Compute single clean watermark stamp text for offline site photos (NO coordinates).
+   * - Mainline: "Km1+000"
+   * - Munyonyo Spur (to Lweza): "LK0+650"
+   * - Interchange Ramps: "Mpala AK0+300", "Busega BK0+200", etc.
+   */
+  function formatPhotoStamp(resolved) {
+    if (!resolved) {
+      return { text: "Km0+000", badge: "", color: "#F59E0B" };
+    }
+    if (resolved.kind === "ramp") {
+      var rampCodeCh =
+        resolved.code === "ACCESS"
+          ? "ACCESS " + formatNoPrefix(resolved.chainage)
+          : formatChainage(resolved.chainage, resolved.prefix);
+      return {
+        text: resolved.groupShort + " " + rampCodeCh,
+        badge: resolved.code === "ACCESS" ? "ACC" : resolved.code,
+        color: resolved.pillBg || resolved.color || "#DC2626"
+      };
+    }
+    if (resolved.alignmentId === "lk_spur") {
+      return {
+        text: formatChainage(resolved.chainage, "LK"),
+        badge: "LK",
+        color: resolved.pillBg || "#0369A1"
+      };
+    }
+    return {
+      text: "Km" + formatNoPrefix(resolved.chainage),
+      badge: "",
+      color: "#F59E0B"
+    };
   }
 
   function withinBbox(lat, lon, bbox, padDeg) {
@@ -193,19 +235,20 @@
     var proj = chosen.proj;
     var offAlignment = proj.distanceM > offThreshold;
 
+    // Plain Ugandan site wording: "To Entebbe" / "To Busega" / "Center"
     var sideCode = "MEDIAN";
     var plainBound = null;
     if (!offAlignment) {
       if (alignment.fixedBound) {
-        sideCode = alignment.fixedBound === "Kampala Bound" ? "RHS" : "LHS";
-        plainBound = alignment.fixedBound;
+        sideCode = "RHS";
+        plainBound = "To Busega";
       } else if (alignment.id === "mainline") {
         if (proj.signedOffsetM > medianHalfWidth) {
           sideCode = "LHS";
-          plainBound = "Entebbe Bound";
+          plainBound = "To Entebbe";
         } else if (proj.signedOffsetM < -medianHalfWidth) {
           sideCode = "RHS";
-          plainBound = "Kampala Bound";
+          plainBound = "To Busega";
         } else {
           sideCode = "MEDIAN";
           plainBound = "Center";
@@ -277,15 +320,29 @@
     };
   }
 
+  function bearingBetween(lat1, lon1, lat2, lon2) {
+    var cosLat = Math.cos(((lat1 + lat2) * 0.5) * DEG_TO_RAD);
+    var dN = (lat2 - lat1) * EARTH_RADIUS_M * DEG_TO_RAD;
+    var dE = (lon2 - lon1) * EARTH_RADIUS_M * DEG_TO_RAD * cosLat;
+    var dist = Math.sqrt(dN * dN + dE * dE);
+    return {
+      distanceM: dist,
+      bearingDeg: (Math.atan2(dE, dN) * RAD_TO_DEG + 360) % 360
+    };
+  }
+
   return {
     MEDIAN_HALF_WIDTH_M: MEDIAN_HALF_WIDTH_M,
     OFF_ALIGNMENT_THRESHOLD_M: OFF_ALIGNMENT_THRESHOLD_M,
     JUNCTION_HYSTERESIS_M: JUNCTION_HYSTERESIS_M,
     BRIDGE_OVERLAP_THRESHOLD_M: BRIDGE_OVERLAP_THRESHOLD_M,
+    formatNoPrefix: formatNoPrefix,
     formatChainage: formatChainage,
     formatDistance: formatDistance,
+    formatPhotoStamp: formatPhotoStamp,
     projectOntoAlignment: projectOntoAlignment,
     resolvePosition: resolvePosition,
-    pointAtChainageOffset: pointAtChainageOffset
+    pointAtChainageOffset: pointAtChainageOffset,
+    bearingBetween: bearingBetween
   };
 });

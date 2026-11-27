@@ -1,4 +1,4 @@
-/* Old-Android-WebView-safe CSS (Android 7.0+ / Chrome 60+ compatible: no inset, no clamp) */
+/* Old-Android-WebView-safe CSS (Android 7.0+ / Chrome 60+ compatible) */
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -28,7 +28,7 @@ html, body {
 }
 
 .leaflet-control-attribution {
-  background: rgba(11, 18, 32, 0.6) !important;
+  background: rgba(11, 18, 32, 0.55) !important;
   color: #94A3B8 !important;
   font-size: 9px !important;
   padding: 1px 5px !important;
@@ -194,13 +194,13 @@ html, body {
 .hud-chainage {
   font-family: monospace;
   font-weight: 900;
-  font-size: 36px;
+  font-size: 34px;
   line-height: 1.05;
   letter-spacing: -0.02em;
   color: #FFFFFF;
 }
 @media (min-width: 380px) {
-  .hud-chainage { font-size: 42px; }
+  .hud-chainage { font-size: 40px; }
 }
 .hud-chainage .ch-k { color: #F59E0B; }
 .hud-chainage .ch-plus { color: #94A3B8; font-weight: 700; }
@@ -293,34 +293,57 @@ html, body {
   border-radius: 10px;
 }
 
-/* Single Clean Re-Center Button */
-.center-fab {
+/* Right-Side 3 Crisp Action Buttons */
+.fab-stack {
   position: fixed;
   right: 14px;
-  bottom: 34px;
+  bottom: 84px;
   z-index: 460;
-  width: 54px;
-  height: 54px;
+  display: flex;
+  flex-direction: column;
+}
+
+.fab-circle {
+  width: 52px;
+  height: 52px;
+  margin-top: 10px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.28);
   background: rgba(11, 18, 32, 0.92);
   color: #F8FAFC;
-  font-size: 24px;
-  line-height: 50px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 0;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
 }
-.center-fab.active {
+.fab-circle:first-child {
+  margin-top: 0;
+}
+.fab-circle.active {
   background: #F59E0B;
   color: #0B1220;
   border-color: #FDE68A;
 }
+#compassBtn.active {
+  background: rgba(11, 18, 32, 0.94);
+  border-color: #38BDF8;
+}
+.fab-circle.camera-fab {
+  background: #F59E0B;
+  color: #0B1220;
+  border-color: #FFFFFF;
+}
+.fab-svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
 
-/* Bottom Sheet Container */
+/* Bottom Sheet & Photo Saved Toast */
 .hud-bottom {
   position: fixed;
-  bottom: 16px;
+  bottom: 14px;
   left: 12px;
   right: 12px;
   max-width: 460px;
@@ -330,6 +353,34 @@ html, body {
 }
 .hud-bottom > * {
   pointer-events: auto;
+}
+
+.photo-toast {
+  background: #052E16;
+  border: 1.5px solid #22C55E;
+  border-radius: 14px;
+  padding: 9px 12px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
+}
+.photo-toast-text {
+  font-size: 13px;
+  font-weight: 800;
+  color: #DCFCE7;
+  margin-right: 10px;
+}
+.share-btn {
+  border: none;
+  background: #22C55E;
+  color: #052E16;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 7px 14px;
+  border-radius: 9px;
+  flex-shrink: 0;
 }
 
 .sheet {
@@ -436,29 +487,63 @@ html, body {
   font-size: 12px;
 }
 
-/* Crisp Color-Coded Map Markers */
-.ch-tick-label {
+/* === Style 1 Decluttered Map Markers (Upright at every map rotation) === */
+
+/* Mainline crisp dark pill without K (e.g. 11+750, 12+000) */
+.main-tick-pill {
   display: inline-block;
   width: max-content;
-  background: rgba(11, 18, 32, 0.92);
+  background: rgba(11, 18, 32, 0.90);
   color: #FFFFFF;
   border: 1.5px solid #F59E0B;
   border-radius: 5px;
   padding: 1px 5px;
   font-family: monospace;
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 800;
   line-height: 1.2;
   white-space: nowrap;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.65);
   transform: translate(-50%, -50%);
 }
-.ch-tick-label.minor {
-  background: rgba(11, 18, 32, 0.86);
+
+/* Ramp & LK clean haloed 50 m number (0+050, 0+100, 0+200) — zero bulky box! */
+.halo-tick {
+  display: inline-block;
+  width: max-content;
+  color: #FFFFFF;
+  font-family: monospace;
+  font-size: 10.5px;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  text-shadow:
+    -1.5px -1.5px 0 #0B1220,
+     1.5px -1.5px 0 #0B1220,
+    -1.5px  1.5px 0 #0B1220,
+     1.5px  1.5px 0 #0B1220,
+     0px    0px   4px #0B1220;
+  transform: translate(-50%, -50%);
+}
+.halo-tick.sub50 {
   font-size: 9.5px;
-  padding: 1px 4px;
+  color: #E2E8F0;
 }
 
+/* Tiny white 50 m tick dot right on ramp/LK road line */
+.tick-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid #0B1220;
+}
+.tick-dot.maj100 {
+  width: 9px;
+  height: 9px;
+}
+
+/* Bold colored ramp identity badge (AK, BK, CK, DK, UK, RK, LK) */
 .ramp-code-badge {
   display: inline-block;
   width: max-content;
@@ -472,6 +557,56 @@ html, body {
   line-height: 1.15;
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+  transform: translate(-50%, -50%);
+}
+
+/* Ramp Start ● (Green Circle) & Start Label (e.g. AK0+000) */
+.ramp-start-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #22C55E;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
+}
+.start-code-pill {
+  display: inline-block;
+  width: max-content;
+  background: #14532D;
+  color: #DCFCE7;
+  border: 1.3px solid #4ADE80;
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+  transform: translate(-50%, -50%);
+}
+
+/* Ramp End ■ (Colored Square) & End Label (e.g. AK0+545) */
+.ramp-end-sq {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  border: 2px solid #FFFFFF;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.8);
+}
+.end-code-pill {
+  display: inline-block;
+  width: max-content;
+  color: #FFFFFF;
+  border: 1.3px solid #FFFFFF;
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-family: monospace;
+  font-size: 9.5px;
+  font-weight: 800;
+  line-height: 1.15;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
   transform: translate(-50%, -50%);
 }
 
@@ -489,15 +624,6 @@ html, body {
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
   transform: translate(-50%, -50%);
-}
-
-.ramp-start-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #22C55E;
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.75);
 }
 
 .gps-live-marker {

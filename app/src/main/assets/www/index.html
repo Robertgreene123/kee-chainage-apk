@@ -10,7 +10,7 @@
 <body>
   <div id="map" aria-label="Kampala-Entebbe Expressway Satellite Map"></div>
 
-  <!-- Slim, High-Contrast Top Readout -->
+  <!-- Slim Top Readout (kept with ramp descriptions & bridge chips for field testing) -->
   <header class="hud-top">
     <div id="simBanner" class="sim-banner hidden" role="status">
       <span>SIMULATION MODE — NOT LIVE GPS</span>
@@ -34,17 +34,14 @@
 
       <div class="hud-main-row">
         <div id="chainageReadout" class="hud-chainage" title="Tap to copy chainage">
-          <span class="ch-k">K</span>--<span class="ch-plus">+</span>---
+          <span class="ch-k">Km</span>--<span class="ch-plus">+</span>---
         </div>
         <span id="sidePill" class="side-pill hidden"></span>
       </div>
 
-      <div id="copyToast" class="copy-toast hidden">Copied to clipboard!</div>
+      <div id="copyToast" class="copy-toast hidden">Copied!</div>
       <div id="rampDesc" class="ramp-desc hidden"></div>
-
-      <!-- Appears only when standing at a bridge/overpass where 2 roads cross -->
       <div id="altRow" class="alt-row hidden" aria-label="Nearby crossing roads"></div>
-
       <div id="weakGpsStrip" class="alert-strip weak hidden" role="alert"></div>
       <div id="offAlignStrip" class="alert-strip off hidden" role="alert"></div>
 
@@ -52,11 +49,42 @@
     </section>
   </header>
 
-  <!-- Single Floating Re-Center Button -->
-  <button type="button" id="followBtn" class="center-fab active" aria-label="Center map on my location" title="Center on me">◎</button>
+  <!-- Right-Side 3 Crisp Action Buttons: Compass/Heading-Up, Offline Camera, Follow/Center -->
+  <aside class="fab-stack" aria-label="Map and camera actions">
+    <button type="button" id="compassBtn" class="fab-circle active" aria-label="Toggle Heading-Up or North-Up" title="Auto-Rotate Heading-Up">
+      <svg id="compassSvg" class="fab-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <polygon points="12,2 16,12 12,10 8,12" fill="#EF4444"/>
+        <polygon points="12,22 16,12 12,14 8,12" fill="#E2E8F0"/>
+        <circle cx="12" cy="12" r="2" fill="#0B1220"/>
+      </svg>
+    </button>
 
-  <!-- Collapsible Quick-Jump & Desk Test Sheet -->
+    <button type="button" id="cameraBtn" class="fab-circle camera-fab" aria-label="Take stamped site photo" title="Take Stamped Photo">
+      <svg class="fab-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 7h3l1.6-2h6.8L17 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="12" cy="13.5" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/>
+      </svg>
+    </button>
+
+    <button type="button" id="followBtn" class="fab-circle active" aria-label="Center map on my location" title="Center on me">
+      <svg class="fab-svg" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="6" fill="none" stroke="currentColor" stroke-width="2.2"/>
+        <circle cx="12" cy="12" r="2.2" fill="currentColor"/>
+        <line x1="12" y1="2" x2="12" y2="5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="12" y1="18.5" x2="12" y2="22" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="2" y1="12" x2="5.5" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        <line x1="18.5" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- Post-Snap Photo Saved Banner + Collapsible Setup / Desk Test Sheets -->
   <footer class="hud-bottom">
+    <section id="photoToast" class="photo-toast hidden" role="status">
+      <span id="photoToastText" class="photo-toast-text">Saved photo to Gallery</span>
+      <button type="button" id="sharePhotoBtn" class="share-btn">Share</button>
+    </section>
+
     <section id="setupSheet" class="sheet hidden" aria-label="Menu">
       <div class="sheet-header">
         <span class="sheet-title">Interchanges (100% Offline)</span>
@@ -79,11 +107,10 @@
       </div>
     </section>
 
-    <!-- Desk Test Simulator (tucked inside ⚙) -->
     <section id="simDrawer" class="sheet hidden" aria-label="Desk test simulator">
       <div class="sheet-header">
         <span class="sheet-title">Desk Test Simulator</span>
-        <span id="simLabel" class="sheet-sub">K11+720</span>
+        <span id="simLabel" class="sheet-sub">Km11+720</span>
       </div>
       <div class="sim-row">
         <span>Road</span>
@@ -106,6 +133,7 @@
   </footer>
 
   <script src="./vendor/leaflet.js"></script>
+  <script src="./vendor/leaflet-rotate.js"></script>
   <script src="./alignment-data.js"></script>
   <script src="./geo-engine.js"></script>
   <script src="./earth-app.js"></script>
